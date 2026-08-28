@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+venv/
+.venv/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# uv
+.uv/
+uv.cache/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local runtime artifacts
+var/
+data/
+*.duckdb
+*.sqlite
+*.sqlite3
+*.db
+
+# Airflow
+airflow.db
+airflow.cfg
+logs/
+standalone_admin_password.txt
+
+# dbt
+dbt_packages/
+target/
+logs/
+dbt.log
+
+# Feast
+registry.db
+*.registry.db
+feast_ui/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

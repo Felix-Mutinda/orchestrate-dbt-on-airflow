@@ -1,0 +1,10 @@
+[project]
+name = "dbt-airflow-cosmos-feast"
+version = "0.1.0"
+description = "Local-to-prod feature platform scaffold: dbt + Airflow + Cosmos + Feast, with config-only GitOps promotion."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+package = false
