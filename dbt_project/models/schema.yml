@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_yellow_trips
+    description: "Staged yellow taxi trips with basic cleaning."
+    
+  - name: stg_taxi_zones
+    description: "Cleaned taxi zone lookup."
+
+  - name: fct_trips
+    description: "Fact table for taxi trips."
+    columns:
+      - name: trip_id
+        tests:
+          - unique
+          - not_null
+
+  - name: feature_pickup_zone_hourly
+    description: "Hourly aggregated features for pickup zones."
+    columns:
+      - name: pickup_zone_id
+        tests:
+          - not_null

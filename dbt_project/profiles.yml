@@ -1,0 +1,8 @@
+feature_platform:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      # Path relative to the repo root where dbt is executed
+      path: "var/duckdb/feature_platform.duckdb"
+      threads: 4

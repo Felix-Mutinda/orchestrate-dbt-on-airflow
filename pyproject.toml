@@ -4,7 +4,18 @@ version = "0.1.0"
 description = "Local-to-prod feature platform scaffold: dbt + Airflow + Cosmos + Feast, with config-only GitOps promotion."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "dbt-duckdb>=1.11.0",
+    "pandas>=3.0.5",
+    "pyarrow>=25.0.1",
+]
 
 [tool.uv]
 package = false
+
+[dependency-groups]
+dev = [
+    "ipython>=9.17.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.5",
+]

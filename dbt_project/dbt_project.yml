@@ -1,0 +1,15 @@
+name: 'feature_platform'
+version: '1.0.0'
+config-version: 2
+profile: 'feature_platform'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  # Point to the raw parquet file
+  raw_data_path: "var/data/yellow_tripdata_2026-05.parquet"
