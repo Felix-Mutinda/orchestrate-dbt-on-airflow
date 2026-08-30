@@ -1,3 +1,5 @@
+{{ config(materialized='table') }}
+
 select
     VendorID as vendor_id,
     tpep_pickup_datetime as pickup_at,

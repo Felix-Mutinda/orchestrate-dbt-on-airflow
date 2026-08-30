@@ -1,0 +1,96 @@
+x-airflow-common: &airflow-common
+  build: .
+  environment: &airflow-common-env
+    ENV_NAME: ${ENV_NAME:-local}
+    
+    # --- AIRFLOW 3 CORE & EXECUTION ---
+    AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR:-LocalExecutor}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN:-sqlite:////opt/airflow/var/airflow/airflow.db}
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    
+    # --- AIRFLOW 3 NETWORKING & API ROUTING ---
+    # Routes task execution callbacks across the Docker bridge to the api-server
+    AIRFLOW__API__BASE_URL: "http://airflow-webserver:8080"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-webserver:8080/execution/"
+    
+    # --- AIRFLOW 3 CRYPTOGRAPHIC SYNC ---
+    # CRITICAL: Must be identical across all containers to prevent JWT/Token mismatch errors
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET:-super_secret_jwt_key_for_local_dev}
+    AIRFLOW__API__SECRET_KEY: ${AIRFLOW__API__SECRET_KEY:-super_secret_api_key_for_local_dev}
+    
+    # --- AUTH ---
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS_FILE: /opt/airflow/simple_auth_manager_users.json
+    
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: 'UTC'
+
+     # --- DBT & DUCKDB ABSOLUTE PATHS ---
+    DUCKDB_PATH: "/opt/airflow/var/duckdb/feature_platform.duckdb"
+    RAW_DATA_PATH: "/opt/airflow/var/data/yellow_tripdata_2026-05.parquet"
+    FEAST_FEATURE_PARQUET_PATH: "/opt/airflow/var/feast/data/features.parquet"
+
+  volumes:
+    - ./dags:/opt/airflow/dags:ro
+    - ./dbt_project:/opt/airflow/dbt_project
+    - ./feast_repo:/opt/airflow/feast_repo:ro
+    - ./scripts:/opt/airflow/scripts:ro
+    - ./config:/opt/airflow/config:ro
+    - ./var:/opt/airflow/var
+  user: "${AIRFLOW_UID:-50000}:0"
+
+services:
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /opt/airflow/var/airflow
+        airflow db migrate
+        
+        # AIRFLOW 3 FIX: Generate the SimpleAuthManager users JSON file
+        python /opt/airflow/scripts/create_admin_user.py
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    command: api-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    hostname: airflow-scheduler
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s

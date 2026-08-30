@@ -5,13 +5,18 @@ description = "Local-to-prod feature platform scaffold: dbt + Airflow + Cosmos +
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "apache-airflow>=3.3.1",
+    "astronomer-cosmos[dbt-duckdb]>=1.15.1",
+    "dbt-core>=1.12.3",
     "dbt-duckdb>=1.11.0",
-    "pandas>=3.0.5",
+    "feast[duckdb]>=0.66.0",
+    "pandas<3",
     "pyarrow>=25.0.1",
 ]
 
 [tool.uv]
 package = false
+
 
 [dependency-groups]
 dev = [

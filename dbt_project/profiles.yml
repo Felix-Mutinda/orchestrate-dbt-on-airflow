@@ -3,6 +3,6 @@ feature_platform:
   outputs:
     local:
       type: duckdb
-      # Path relative to the repo root where dbt is executed
-      path: "var/duckdb/feature_platform.duckdb"
+      # Resolves to absolute path in Cosmos, relative path locally
+      path: "{{ env_var('DUCKDB_PATH', 'var/duckdb/feature_platform.duckdb') }}"
       threads: 4

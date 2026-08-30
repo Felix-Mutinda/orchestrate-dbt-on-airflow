@@ -15,5 +15,21 @@ dbt-build:
 dbt-clean:
 	uv run dbt clean --project-dir dbt_project --profiles-dir dbt_project
 
+airflow-init:
+	mkdir -p var/airflow var/data var/duckdb var/feast
+	docker compose up airflow-init
+
+airflow-up:
+	docker compose up -d
+
+airflow-down:
+	docker compose down
+
+airflow-logs:
+	docker compose logs -f airflow-webserver airflow-scheduler
+
 test-p1:
 	uv run pytest tests/p1 -q
+
+test-p2:
+	uv run pytest tests/p2 -q

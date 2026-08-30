@@ -1,0 +1,10 @@
+project: feature_platform
+registry: ../var/feast/registry.db
+provider: local
+
+offline_store:
+  type: duckdb
+
+online_store:
+  type: sqlite
+  path: ../var/feast/online_store.db

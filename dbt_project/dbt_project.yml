@@ -11,5 +11,5 @@ clean-targets:
   - "dbt_packages"
 
 vars:
-  # Point to the raw parquet file
-  raw_data_path: "var/data/yellow_tripdata_2026-05.parquet"
+  # Resolves to absolute path in Cosmos, relative path locally
+  raw_data_path: "{{ env_var('RAW_DATA_PATH', 'var/data/yellow_tripdata_2026-05.parquet') }}"
