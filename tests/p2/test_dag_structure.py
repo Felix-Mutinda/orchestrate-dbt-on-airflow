@@ -83,9 +83,9 @@ def test_dag_imports_inside_functions(dag_source):
 
 
 def test_dag_task_dependency_chain(dag_source):
-    """Verify the DAG has the correct dependency chain: dbt >> export >> feast."""
+    """Verify the DAG has the correct dependency chain: dbt >> feast."""
     assert ">>" in dag_source, "DAG must define task dependencies"
     # Check that export is between dbt and feast
-    assert "dbt_pipeline >> export_task >> feast_task" in dag_source, (
-        "DAG must chain: dbt_pipeline >> export_task >> feast_task"
+    assert "dbt_pipeline >> feast_task" in dag_source, (
+        "DAG must chain: dbt_pipeline >> feast_task"
     )

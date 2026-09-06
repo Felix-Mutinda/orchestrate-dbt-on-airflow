@@ -76,12 +76,18 @@ view-docs: docs ## Serve dbt docs in browser
 # P4: Config & Promotion
 # ------------------------------------------------------------
 config-check: ## Validate config files load correctly
-	uv run python -c "import sys; sys.path.insert(0, 'scripts'); from config import get_config; c = get_config(); print(f'✅ Loaded config for: {c.env_name}')"
+	uv run python -c "import sys; sys.path.insert(0, 'scripts'); from config import get_config; c = get_config(); print(f'Loaded config for: {c.env_name}')"
+
+# ------------------------------------------------------------
+# P5: CI/CD & Promotion
+# ------------------------------------------------------------
+validate-promotion: ## Run the promotion proof script
+	uv run python scripts/validate_promotion.py
 
 # ------------------------------------------------------------
 # Tests
 # ------------------------------------------------------------
-test: test-p1 test-p2 test-p3 test-p4 ## Run all tests
+test: test-p1 test-p2 test-p3 test-p4 test-p5 ## Run all tests
 	@echo "All tests passed"
 
 test-p1: ## P1: dbt + DuckDB feature engineering tests
@@ -95,6 +101,9 @@ test-p3: ## P3: Lineage + manifest tests
 
 test-p4: ## P4: Config loader + promotion tests
 	uv run pytest tests/p4 -q
+
+test-p5: ## P5: Promotion and CI guardrail tests
+	uv run pytest tests/p5 -q
 
 # ------------------------------------------------------------
 # Reset & Maintenance
