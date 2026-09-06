@@ -23,6 +23,9 @@ jobs:
 
       - name: Install dependencies
         run: uv sync
+      
+      - name: Create runtime directories
+        run: mkdir -p var/data var/duckdb var/feast
 
       - name: Fetch dataset
         run: uv run python scripts/fetch_dataset.py
