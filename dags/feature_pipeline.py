@@ -21,7 +21,12 @@ dbt_env_vars = {
     "ENV_NAME": config.env_name,
     "WAREHOUSE_PATH": config.warehouse.path or "",
     "WAREHOUSE_SCHEMA": config.warehouse.schema_name,
+    "FEAST_FEATURE_PARQUET_PATH": "/opt/airflow/var/feast/data/features.parquet", 
 }
+
+# Inject Feast env vars globally for this DAG process
+os.environ["FEAST_ONLINE_STORE_TYPE"] = config.feast.online_store_type
+os.environ["FEAST_ONLINE_STORE_PATH"] = config.feast.online_store_path
 
 project_config = ProjectConfig(dbt_project_path=str(REPO_ROOT / "dbt_project"))
 profile_config = ProfileConfig(
@@ -31,7 +36,7 @@ profile_config = ProfileConfig(
 )
 render_config = RenderConfig(emit_datasets=True, test_behavior=TestBehavior.AFTER_EACH)
 
-# 3. Helper function to export features
+# 3. Helper function to export features (used dbt-duckdb external materialization instead)
 def export_features_to_parquet():
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
     from export_features import main as export_main
@@ -39,38 +44,27 @@ def export_features_to_parquet():
 
 # 4. Helper function for Feast
 def feast_apply_and_materialize():
-    import sys
-    from datetime import UTC, datetime
-    from pathlib import Path
-
     from feast import FeatureStore
     from feast.repo_operations import apply_total, parse_repo
 
     repo_root_path = Path(REPO_ROOT)
     feast_repo_path = repo_root_path / "feast_repo"
-
     if str(repo_root_path) not in sys.path:
         sys.path.insert(0, str(repo_root_path))
-    if str(feast_repo_path) not in sys.path:
-        sys.path.insert(0, str(feast_repo_path))
-
-    # Initialize the FeatureStore object pointing to our repo
     store = FeatureStore(repo_path=str(feast_repo_path))
-
-    # 1. Apply registry by scanning the repo files
-    print("Applying Feast registry...")
+    
+    print(f"Applying Feast registry for {config.env_name}...")
+    if str(feast_repo_path) not in sys.path:
+            sys.path.insert(0, str(feast_repo_path))
     repo_config = store.config
-    # Parse the repo to get the objects (entities, feature views, etc.) defined in the repo
-    _repo_objects = parse_repo(feast_repo_path)
+    repo_objects = parse_repo(Path(feast_repo_path)) 
     apply_total(repo_config, feast_repo_path, False)
-
-    # 2. Materialize to online store
-    print("Materializing features...")
+    
+    print(f"Materializing from {config.feast.materialize_start} to {config.feast.materialize_end}...")
     store.materialize(
-        start_date=datetime(2024, 1, 1, tzinfo=UTC),
-        end_date=datetime(2026, 6, 1, tzinfo=UTC),
+        start_date=datetime.fromisoformat(config.feast.materialize_start), 
+        end_date=datetime.fromisoformat(config.feast.materialize_end)
     )
-    print("Feast materialization complete.")
 
 # 5. DAG Definition
 default_args = {"owner": "platform", "retries": 1, "retry_delay": timedelta(minutes=5)}
@@ -94,14 +88,9 @@ with DAG(
         operator_args={"install_deps": False, "env": dbt_env_vars}, # Pass env vars to dbt
     )
 
-    export_task = PythonOperator(
-        task_id="export_features_to_parquet",
-        python_callable=export_features_to_parquet,
-    )
-
     feast_task = PythonOperator(
         task_id="feast_apply_and_materialize",
         python_callable=feast_apply_and_materialize,
     )
 
-    dbt_pipeline >> export_task >> feast_task
+    dbt_pipeline >> feast_task

@@ -1,12 +1,12 @@
 feature_platform:
-  target: "{{ env_var('ENV_NAME') }}"
+  target: "{{ env_var('ENV_NAME', 'local') }}"
   outputs:
     local:
       type: duckdb
-      path: "{{ env_var('WAREHOUSE_PATH') }}"
+      path: "{{ env_var('WAREHOUSE_PATH', 'var/duckdb/feature_platform.duckdb') }}"
       threads: 4
-      schema: "{{ env_var('WAREHOUSE_SCHEMA') }}"
-    
+      schema: "{{ env_var('WAREHOUSE_SCHEMA', 'main') }}"
+
     dev:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'mock_dev_account') }}"
