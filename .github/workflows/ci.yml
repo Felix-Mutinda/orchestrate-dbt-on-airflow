@@ -16,13 +16,13 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
-          version: "0.4.0"
+          version: "0.11.17"
 
       - name: Set up Python
         run: uv python install 3.11
 
       - name: Install dependencies
-        run: uv sync --all-extras
+        run: uv sync --all-groups --dev
       
       - name: Create runtime directories
         run: mkdir -p var/data var/duckdb var/feast/data
