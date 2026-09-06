@@ -1,0 +1,12 @@
+warehouse:
+  type: duckdb
+  path: "/opt/airflow/var/duckdb/feature_platform.duckdb"
+  schema: main
+
+feast:
+  online_store_type: sqlite
+  online_store_path: "../var/feast/online_store.db"
+  materialize_start: "2024-01-01T00:00:00"
+  materialize_end: "2026-06-01T00:00:00"
+
+max_active_tasks: 1  # DuckDB single-writer lock constraint

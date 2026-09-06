@@ -1,0 +1,12 @@
+warehouse:
+  type: snowflake
+  path: null  # Snowflake doesn't use a local file path
+  schema: dev_dbt
+
+feast:
+  online_store_type: redis
+  online_store_path: "redis.dev.internal:6379"
+  materialize_start: "2026-01-01T00:00:00"
+  materialize_end: "2026-09-01T00:00:00"
+
+max_active_tasks: 32  # Snowflake handles massive concurrency

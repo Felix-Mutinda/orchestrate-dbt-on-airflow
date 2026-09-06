@@ -6,5 +6,5 @@ offline_store:
   type: duckdb
 
 online_store:
-  type: sqlite
-  path: ../var/feast/online_store.db
+  type: ${FEAST_ONLINE_STORE_TYPE}
+  path: ${FEAST_ONLINE_STORE_PATH}

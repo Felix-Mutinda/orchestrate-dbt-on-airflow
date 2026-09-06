@@ -24,7 +24,11 @@ x-airflow-common: &airflow-common
     
     AIRFLOW__CORE__DEFAULT_TIMEZONE: 'UTC'
 
-     # --- DBT & DUCKDB ABSOLUTE PATHS ---
+    # --- DBT ENV VARS FOR DAG PARSING ---
+    WAREHOUSE_PATH: "/opt/airflow/var/duckdb/feature_platform.duckdb"
+    WAREHOUSE_SCHEMA: "main"
+
+    # --- DBT & DUCKDB ABSOLUTE PATHS ---
     DUCKDB_PATH: "/opt/airflow/var/duckdb/feature_platform.duckdb"
     RAW_DATA_PATH: "/opt/airflow/var/data/yellow_tripdata_2026-05.parquet"
     FEAST_FEATURE_PARQUET_PATH: "/opt/airflow/var/feast/data/features.parquet"

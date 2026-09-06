@@ -1,8 +1,30 @@
 feature_platform:
-  target: local
+  target: "{{ env_var('ENV_NAME') }}"
   outputs:
     local:
       type: duckdb
-      # Resolves to absolute path in Cosmos, relative path locally
-      path: "{{ env_var('DUCKDB_PATH', 'var/duckdb/feature_platform.duckdb') }}"
+      path: "{{ env_var('WAREHOUSE_PATH') }}"
       threads: 4
+      schema: "{{ env_var('WAREHOUSE_SCHEMA') }}"
+    
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'mock_dev_account') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'dev_user') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', 'dev_pass') }}"
+      role: sysadmin
+      database: dev_db
+      warehouse: compute_wh
+      schema: "{{ env_var('WAREHOUSE_SCHEMA') }}"
+      threads: 8
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'mock_prod_account') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'prod_user') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', 'prod_pass') }}"
+      role: sysadmin
+      database: prod_db
+      warehouse: compute_wh
+      schema: "{{ env_var('WAREHOUSE_SCHEMA') }}"
+      threads: 16
