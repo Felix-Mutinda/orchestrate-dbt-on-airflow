@@ -181,16 +181,7 @@ DuckDB enforces a single-writer file lock. The DAG sets `max_active_tasks=1` to 
 | **P2** | ✅ Complete | Orchestration (Airflow 3 + Cosmos + Feast via Docker Compose) |
 | **P3** | ✅ Complete | Lineage (dbt docs + Airflow Assets + lineage tests) |
 | **P4** | ✅ Complete | Environment config (Pydantic loader + config-only promotion) |
-| **P5** | 🔲 Planned | CI/CD and GitOps promotion |
-
-### P5 Deliverables (Planned)
-
-- CI validation pipeline (GitHub Actions)
-- DAG import test
-- Cosmos render test
-- dbt build test
-- Feast registry test
-- Config-only promotion diff proof
+| **P5** | ✅ Complete | CI/CD and GitOps promotion |
 
 ## Local Setup
 
