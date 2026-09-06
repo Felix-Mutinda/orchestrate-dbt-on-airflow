@@ -22,7 +22,7 @@ jobs:
         run: uv python install 3.11
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --all-groups
       
       - name: Create runtime directories
         run: mkdir -p var/data var/duckdb var/feast/data
