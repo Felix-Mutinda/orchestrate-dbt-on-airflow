@@ -2,6 +2,8 @@
 
 Local-to-prod feature pipeline scaffold for orchestrating dbt models with Airflow 3 via Astronomer Cosmos, then materializing features into Feast through a GitOps-driven promotion flow.
 
+![DAG Image](assets/dag.png)
+
 ## High-Level Design
 
 This repository implements a portable feature pipeline with the following shape:
