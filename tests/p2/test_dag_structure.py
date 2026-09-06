@@ -31,6 +31,10 @@ def test_dag_file_is_valid_python(dag_source):
         pytest.fail(f"DAG file has syntax error: {e}")
 
 
+def test_dag_has_fetch_task(dag_source):
+    assert "fetch_dataset" in dag_source, "DAG must have an idempotent fetch task"
+
+
 def test_dag_defines_feature_platform_pipeline(dag_source):
     assert "feature_platform_pipeline" in dag_source, (
         "DAG must define feature_platform_pipeline"

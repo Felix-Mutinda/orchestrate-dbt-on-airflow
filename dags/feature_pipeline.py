@@ -44,6 +44,15 @@ profile_config = ProfileConfig(
 render_config = RenderConfig(emit_datasets=True, test_behavior=TestBehavior.AFTER_EACH)
 
 
+# 3. Helper function to fetch the dataset (idempotent)
+def fetch_dataset():
+    """Idempotent raw-data fetch: skips download if the Parquet file already exists."""
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    from fetch_dataset import main as fetch_main
+
+    fetch_main()
+
+
 # 3. Helper function to export features (used dbt-duckdb external materialization instead)
 def export_features_to_parquet():
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -91,6 +100,11 @@ with DAG(
     tags=["dbt", "cosmos", "feast"],
     max_active_tasks=config.max_active_tasks,  # Dynamically set concurrency
 ) as dag:
+    fetch_task = PythonOperator(
+        task_id="fetch_dataset",
+        python_callable=fetch_dataset,
+    )
+
     dbt_pipeline = DbtTaskGroup(
         group_id="dbt_feature_transformations",
         project_config=project_config,
@@ -108,4 +122,4 @@ with DAG(
         python_callable=feast_apply_and_materialize,
     )
 
-    dbt_pipeline >> feast_task
+    fetch_task >> dbt_pipeline >> feast_task
