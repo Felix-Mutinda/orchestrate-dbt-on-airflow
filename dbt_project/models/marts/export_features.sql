@@ -1,7 +1,7 @@
 
 {{ config(
     materialized='external',
-    location=env_var('FEAST_FEATURE_PARQUET_PATH')
+    location=env_var('FEAST_FEATURE_PARQUET_PATH', 'var/feast/data/features.parquet')
 ) }}
 
 select 
